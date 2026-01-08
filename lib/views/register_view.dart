@@ -79,43 +79,53 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               const SizedBox(height: 20),
 
-              // --- CAMPO CORREO ---
+             // --- CAMPO CORREO ---
               TextFormField(
                 controller: emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'Correo Electrónico',
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Ingrese su correo';
-                  if (!value.contains('@')) return 'Correo inválido';
+                  if (value == null || value.isEmpty) return 'Ingresa un correo';
+                  final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegExp.hasMatch(value)) return 'Formato de correo inválido';
                   return null;
                 },
               ),
               const SizedBox(height: 20),
 
               // --- CAMPO CONTRASEÑA ---
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Contraseña',
-                  prefixIcon: Icon(Icons.lock),
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Contraseña incorrecta';
-               
-                  bool esValida = RegExp(r'[A-Z]').hasMatch(value) && 
-                                  RegExp(r'[0-9]').hasMatch(value) && 
-                                  RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value) &&
-                                  value.toLowerCase().contains('pucetec');
+TextFormField(
+  controller: passwordController,
+  obscureText: true,
+  decoration: const InputDecoration(
+    labelText: 'Contraseña',
+    prefixIcon: Icon(Icons.lock),
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    // 1. Si el campo está vacío
+    if (value == null || value.isEmpty) {
+      return 'Contraseña incorrecta';
+    }
 
-                  if (!esValida) return 'Contraseña incorrecta';
-                  return null;
-                },
-              ),
+    // 2. Verificación de reglas de formato
+    bool tieneMayuscula = RegExp(r'[A-Z]').hasMatch(value);
+    bool tieneNumero = RegExp(r'[0-9]').hasMatch(value);
+    bool tieneSimbolo = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value);
+    bool tienePucetec = value.toLowerCase().contains('pucetec');
+
+    // Si falta cualquiera de estas, el mensaje será "Formato incorrecto"
+    if (!tieneMayuscula || !tieneNumero || !tieneSimbolo || !tienePucetec) {
+      return 'Formato incorrecto';
+    }
+
+    return null; // Todo bien
+  },
+),
               const SizedBox(height: 30),
 
               ElevatedButton(
